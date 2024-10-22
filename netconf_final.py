@@ -42,17 +42,26 @@ def create():
         return "Cannot create: Interface loopback 65070135"
 
 def delete():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
-
-    try:
-        netconf_reply = netconf_edit_config(netconf_config)
-        xml_data = netconf_reply.xml
-        print(xml_data)
-        if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-        print("Error!")
-
+    netconf_config = """<config>
+ <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+  <interface>
+   <Loopback operation="delete">
+    <name>65070135</name>
+   </Loopback>
+  </interface>
+ </native>
+</config>"""
+    if status() == "found":
+        try:
+            netconf_reply = netconf_edit_config(netconf_config)
+            xml_data = netconf_reply.xml
+            print(xml_data)
+            if '<ok/>' in xml_data:
+                return "Interface loopback 65070135 is deleted successfully"
+        except:
+            print("Error!")
+    else:
+        return "Cannot delete: Interface loopback 65070135"
 
 def enable():
     netconf_config = """<!!!REPLACEME with YANG data!!!>"""

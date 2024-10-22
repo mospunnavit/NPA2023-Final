@@ -13,7 +13,7 @@ import netconf_final
 
 #######################################################################################
 # 2. Assign the Webex hard-coded access token to the variable accessToken.
-
+command = ""
 accessToken = "YjdmMGI4OTctN2ViNC00Mzg3LWExMTktMTEzMmViZDQwMzk4MWM4YTdiNWQtYmE0_P0A1_bc884c7a-820b-497b-8b60-00b4d15ea95d"
 
 #######################################################################################
@@ -67,18 +67,17 @@ while True:
 
     # check if the text of the message starts with the magic character "/" followed by your studentID and a space and followed by a command name
     #  e.g.  "/66070123 create"
-    if message.find("/65070135 create") == 0:
-
+    if message.find("/65070135") == 0:
+        
+        command = message.replace("/65070135 ", "")
         # extract the command
-        command = "create"
-        print(command)
 
 # 5. Complete the logic for each command
 
         if command == "create":
             responseMessage = netconf_final.create()
-        # elif command == "delete":
-        #     <!!!REPLACEME with code for delete command!!!>
+        elif command == "delete":
+            responseMessage = netconf_final.delete()
         # elif command == "enable":
         #     <!!!REPLACEME with code for enable command!!!>
         # elif command == "disable":
