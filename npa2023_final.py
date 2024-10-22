@@ -1,24 +1,27 @@
 #######################################################################################
-# Yourname:
-# Your student ID:
+# Yourname: Punnavit Panchang
+# Your student ID: 65070135
 # Your GitHub Repo: 
 
 #######################################################################################
 # 1. Import libraries for API requests, JSON formatting, time, and (restconf_final or netconf_final).
 
-<!!!REPLACEME with code for libraries>
+import requests
+import time
+import json
+import netconf_final
 
 #######################################################################################
 # 2. Assign the Webex hard-coded access token to the variable accessToken.
 
-accessToken = "Bearer <!!!REPLACEME with hard-coded token!!!>"
+accessToken = "YjdmMGI4OTctN2ViNC00Mzg3LWExMTktMTEzMmViZDQwMzk4MWM4YTdiNWQtYmE0_P0A1_bc884c7a-820b-497b-8b60-00b4d15ea95d"
 
 #######################################################################################
 # 3. Prepare parameters get the latest message for messages API.
 
 # Defines a variable that will hold the roomId
 roomIdToGetMessages = (
-    "<!!!REPLACEME with roomID of the NPA2023 Webex Teams room!!!>"
+    "Y2lzY29zcGFyazovL3VybjpURUFNOnVzLXdlc3QtMl9yL1JPT00vZTFmNjU5NTAtN2Q4Ny0xMWVmLThiYjAtNjM4ZjA5NTg3NzUz"
 )
 
 while True:
@@ -31,18 +34,17 @@ while True:
     getParameters = {"roomId": roomIdToGetMessages, "max": 1}
 
     # the Webex Teams HTTP header, including the Authoriztion
-    getHTTPHeader = {"Authorization": <!!!REPLACEME!!!>}
+    getHTTPHeader = {"Authorization": 'Bearer {}'.format(accessToken)}
 
 # 4. Provide the URL to the Webex Teams messages API, and extract location from the received message.
     
     # Send a GET request to the Webex Teams messages API.
     # - Use the GetParameters to get only the latest message.
     # - Store the message in the "r" variable.
-    r = requests.get(
-        "<!!!REPLACEME with URL of Webex Teams Messages API!!!>",
-        params=<!!!REPLACEME with HTTP parameters!!!>,
-        headers=<!!!REPLACEME with HTTP headers!!!>,
-    )
+    r = requests.get("https://webexapis.com/v1/messages",
+                         params  = getParameters, 
+                         headers = getHTTPHeader
+                    )
     # verify if the retuned HTTP status code is 200/OK
     if not r.status_code == 200:
         raise Exception(
@@ -65,42 +67,43 @@ while True:
 
     # check if the text of the message starts with the magic character "/" followed by your studentID and a space and followed by a command name
     #  e.g.  "/66070123 create"
-    if message.find("<!!!REPLACEME!!!>") == 0:
+    if message.find("/65070135 create") == 0:
 
         # extract the command
-        command = <!!!REPLACEME!!!>
+        command = "create"
         print(command)
 
 # 5. Complete the logic for each command
 
         if command == "create":
-            <!!!REPLACEME with code for create command!!!>     
-        elif command == "delete":
-            <!!!REPLACEME with code for delete command!!!>
-        elif command == "enable":
-            <!!!REPLACEME with code for enable command!!!>
-        elif command == "disable":
-            <!!!REPLACEME with code for disable command!!!>
-        elif command == "status":
-            <!!!REPLACEME with code for status command!!!>
+            responseMessage = netconf_final.create()
+        # elif command == "delete":
+        #     <!!!REPLACEME with code for delete command!!!>
+        # elif command == "enable":
+        #     <!!!REPLACEME with code for enable command!!!>
+        # elif command == "disable":
+        #     <!!!REPLACEME with code for disable command!!!>
+        # elif command == "status":
+        #     <!!!REPLACEME with code for status command!!!>
         else:
             responseMessage = "Error: No command or unknown command"
         
 # 6. Complete the code to post the message to the Webex Teams room.
         
         # the Webex Teams HTTP headers, including the Authoriztion and Content-Type
-        postHTTPHeaders = HTTPHeaders = {"Authorization": <!!!REPLACEME!!!>, "Content-Type": <!!!REPLACEME!!!>}
+        postHTTPHeaders = HTTPHeaders = {"Authorization": 'Bearer {}'.format(accessToken), 
+                    "Content-Type": "application/json"}
 
         # The Webex Teams POST JSON data
         # - "roomId" is is ID of the selected room
         # - "text": is the responseMessage assembled above
-        postData = {"roomId": <!!!REPLACEME!!!>, "text": <!!!REPLACEME!!!>}
+        postData = {"roomId": roomIdToGetMessages, "text": responseMessage}
 
         # Post the call to the Webex Teams message API.
         r = requests.post(
-            "<!!!REPLACEME with URL of Webex Teams Messages API!!!>",
-            data=json.dumps(<!!!REPLACEME!!!>a),
-            headers=<!!!REPLACEME!!!>,
+            "https://webexapis.com/v1/messages",
+            data=json.dumps(postData),
+            headers=postHTTPHeaders,
         )
         if not r.status_code == 200:
             raise Exception(
