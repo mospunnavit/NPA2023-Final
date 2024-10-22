@@ -78,12 +78,12 @@ while True:
             responseMessage = netconf_final.create()
         elif command == "delete":
             responseMessage = netconf_final.delete()
-        # elif command == "enable":
-        #     <!!!REPLACEME with code for enable command!!!>
-        # elif command == "disable":
-        #     <!!!REPLACEME with code for disable command!!!>
-        # elif command == "status":
-        #     <!!!REPLACEME with code for status command!!!>
+        elif command == "enable":
+            responseMessage = netconf_final.enable()
+        elif command == "disable":
+             responseMessage = netconf_final.disable()
+        elif command == "status":
+             responseMessage = netconf_final.status()
         else:
             responseMessage = "Error: No command or unknown command"
         

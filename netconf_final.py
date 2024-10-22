@@ -2,7 +2,7 @@ from ncclient import manager
 import xmltodict
 
 m = manager.connect(
-    host="10.0.15.182",
+    host="10.0.15.183",
     port=830,
     username="admin",
     password="cisco",
@@ -28,8 +28,8 @@ def create():
   </interface>
  </native>
 </config>"""
-
-    if status() == "not found":
+    statuss = status()
+    if statuss == "No Interface loopback 65070135":
         try:
             netconf_reply = netconf_edit_config(netconf_config)
             xml_data = netconf_reply.xml
@@ -51,7 +51,8 @@ def delete():
   </interface>
  </native>
 </config>"""
-    if status() == "found":
+    statuss = status()
+    if statuss == "Interface loopback 65070135 is enabled" or statuss == "Interface loopback 65070135 is disabled" :
         try:
             netconf_reply = netconf_edit_config(netconf_config)
             xml_data = netconf_reply.xml
@@ -64,29 +65,57 @@ def delete():
         return "Cannot delete: Interface loopback 65070135"
 
 def enable():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
-
-    try:
-        netconf_reply = netconf_edit_config(netconf_config)
-        xml_data = netconf_reply.xml
-        print(xml_data)
-        if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-        print("Error!")
-
+    netconf_config = """  <config>
+      <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+        <interface>
+          <Loopback>
+            <name>65070135</name> 
+            <shutdown operation="remove"/>
+          </Loopback>
+        </interface>
+      </native>
+    </config>"""
+    statuss = status()
+    if statuss == "Interface loopback 65070135 is enabled":
+        return "Interface loopback 65070135 is enabled"
+    elif statuss == "Interface loopback 65070135 is disabled":
+        try:
+            netconf_reply = netconf_edit_config(netconf_config)
+            xml_data = netconf_reply.xml
+            print(xml_data)
+            if '<ok/>' in xml_data:
+                return "Interface loopback 65070135 is enabled successfully"
+        except:
+            print("Cannot enable: Interface loopback 65070135!")
+    else:
+        return "Cannot enable: Interface loopback 65070135!"
 
 def disable():
-    netconf_config = """<!!!REPLACEME with YANG data!!!>"""
-
-    try:
-        netconf_reply = netconf_edit_config(netconf_config)
-        xml_data = netconf_reply.xml
-        print(xml_data)
-        if '<ok/>' in xml_data:
-            return "<!!!REPLACEME with proper message!!!>"
-    except:
-        print("Error!")
+    netconf_config =  """
+        <config>
+    <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+        <interface>
+        <Loopback>
+            <name>65070135</name>
+            <shutdown/> 
+        </Loopback>
+        </interface>
+    </native>
+    </config>
+    """
+    statuss = status()
+    print(statuss)
+    if statuss == "Interface loopback 65070135 is enabled":
+        try:
+            netconf_reply = netconf_edit_config(netconf_config)
+            xml_data = netconf_reply.xml
+            print(xml_data)
+            if '<ok/>' in xml_data:
+                return "Interface loopback 65070135 is disable successfully"
+        except Exception as e:
+            print(e)
+    else:
+        return "Cannot disable: Interface loopback 65070135!"
 
 def netconf_edit_config(netconf_config):
     return  m.edit_config(target="running", config=netconf_config)
@@ -98,7 +127,6 @@ def status():
  <interface><name>Loopback65070135</name></interface>
  </interfaces-state>
 </filter>"""
-    print("s1")
     # Use Netconf operational operation to get interfaces-state information
     netconf_reply = m.get(filter=netconf_filter)
     print(netconf_reply)
@@ -112,11 +140,11 @@ def status():
         admin_status = interface_data['admin-status']
         oper_status = interface_data['oper-status']
         if admin_status == 'up' and oper_status == 'up':
-            return "found"
+            return "Interface loopback 65070135 is enabled"
         elif admin_status == 'down' and oper_status == 'down':
-            return "found"
+            return "Interface loopback 65070135 is disabled"
     else: # no operation-state data
-        return "not found"
+        return "No Interface loopback 65070135"
        
 
     
